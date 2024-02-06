@@ -12,7 +12,9 @@ pipeline {
     stages {
         stage('Build') {
             steps {
+                script {
                 sh 'docker build -t yhdm/jenkins-docker-hub2 .'
+                       }
             }
         }
 
