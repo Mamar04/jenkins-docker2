@@ -1,4 +1,5 @@
 pipeline {
+   
     agent any
 
     options {
@@ -7,27 +8,29 @@ pipeline {
 
     environment {
         DOCKERHUB_CREDENTIALS = credentials('yhdm')
+        dockerimagename = "yhdm/jenkins-docker-hub2"
+        dockerImage = ""
     }
 
     stages {
         stage('Build') {
             steps {
                 script {
-                sh 'docker build -t yhdm/jenkins-docker-hub2 .'
+                dockerImage = docker.build jenkins-docker-hub2
                        }
             }
         }
 
-        stage('Login') {
-            steps {
-                sh "echo \$DOCKERHUB_CREDENTIALS_PSW | docker login -u \$DOCKERHUB_CREDENTIALS_USR --password-stdin"
-            }
-        }
-
         stage('Push') {
-            steps {
-                sh 'docker push yhdm/jenkins-docker-hub2'
-            }
+            environment {
+               registryCredential = 'yhdm'
+           }
+              steps{
+                 script {
+                 docker.withRegistry( 'https://registry.hub.docker.com', registryCredential ) { dockerImage.push("latest")
+          }
+        }
+      }
         }
     }
 
